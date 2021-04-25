@@ -1,0 +1,9 @@
+##############################
+## Visual Studio
+##############################
+obj/
+bin/
+Properties/
+*.csproj.user
+*.sln
+.editorconfig
