@@ -9,41 +9,56 @@ namespace ECS.Core
 {
     public partial class ECSGame
     {
-        private List<ISystem> systems;
+        private List<ECSSystem> systems;
 
-        private Dictionary<Type, ISystem> systemsByType;
+        private Dictionary<Type, ECSSystem> systemsByType;
 
-        private void InitialiseSystems()
+        private void LoadSystems()
         {
-            systems = new List<ISystem>();
+            systems = new List<ECSSystem>();
 
-            systemsByType = new Dictionary<Type, ISystem>();
+            systemsByType = new Dictionary<Type, ECSSystem>();
+
+            List<Type> allTypes = new List<Type>();
 
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (!type.IsInterface && typeof(ISystem).IsAssignableFrom(type))
+                    allTypes.Add(type);
+
+                    if (!type.IsAbstract && type.IsSubclassOf(typeof(ECSSystem)))
                     {
-                        ISystem newSystem = Activator.CreateInstance(type) as ISystem;
+                        ECSSystem newSystem = Activator.CreateInstance(type) as ECSSystem;
 
                         systems.Add(newSystem);
-                        systemsByType.Add(type, newSystem);
+
+                        systemsByType[type] = newSystem;
                     }
                 }
             }
 
-            IEnumerable<ISystem> GetDependencies(ISystem system)
+            IEnumerable<ECSSystem> GetDependencies(ECSSystem system)
                 => system.GetType()
                 .GetCustomAttributes<DependencyAttribute>()
                 .Select(attribute => systemsByType[attribute.DependingType]);
 
             systems = systems.DependencySort(GetDependencies).ToList();
+
+            foreach (ECSSystem system in systems)
+            {
+                foreach (Type type in allTypes)
+                {
+                    system.OnTypeInspected(type);
+                }
+
+                system.Load();
+            }
         }
 
         private void UpdateSystems(double deltaTimeMs)
         {
-            foreach (ISystem system in systems)
+            foreach (ECSSystem system in systems)
             {
                 system.Update(deltaTimeMs);
             }
@@ -51,10 +66,21 @@ namespace ECS.Core
 
         private void DrawSystems()
         {
-            foreach (ISystem system in systems)
+            foreach (ECSSystem system in systems)
             {
                 system.Draw();
             }
         }
+
+        private void UnloadSystems()
+        {
+            foreach (ECSSystem system in systems)
+            {
+                system.Unload();
+            }
+        }
+
+        public ECSSystem GetSystem<T>() where T : ECSSystem
+            => systemsByType[typeof(T)];
     }
 }

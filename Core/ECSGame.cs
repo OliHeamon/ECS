@@ -4,10 +4,16 @@ namespace ECS.Core
 {
     public abstract partial class ECSGame : Game
     {
+        public static ECSGame Instance { get; private set; }
+
+        public abstract string AssetFolderRelativePath { get; }
+
         private readonly GraphicsDeviceManager graphics;
 
         public ECSGame()
         {
+            Instance = this;
+
             graphics = new GraphicsDeviceManager(this)
             {
                 SynchronizeWithVerticalRetrace = false
@@ -18,7 +24,7 @@ namespace ECS.Core
 
         protected sealed override void Initialize()
         {
-            InitialiseSystems();
+            LoadSystems();
 
             Load();
         }
@@ -30,7 +36,11 @@ namespace ECS.Core
             => DrawSystems();
 
         protected sealed override void UnloadContent()
-            => Unload();
+        {
+            UnloadSystems();
+
+            Unload();
+        }
 
         protected abstract void Load();
 
