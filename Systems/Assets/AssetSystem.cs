@@ -21,7 +21,7 @@ namespace ECS.Systems.Assets
             {
                 IAssetLoader newLoader = Activator.CreateInstance(type) as IAssetLoader;
 
-                loaders[type] = newLoader;
+                loaders[newLoader.AssetType] = newLoader;
             }
         }
 
@@ -39,6 +39,14 @@ namespace ECS.Systems.Assets
                     }
                 }
             });
+        }
+
+        public override void Unload()
+        {
+            foreach (IAssetLoader loader in loaders.Values)
+            {
+                loader.Dispose();
+            }
         }
 
         private void WalkDirectory(string source, Action<string> onFileFound)

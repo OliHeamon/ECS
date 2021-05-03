@@ -30,7 +30,11 @@ namespace ECS.Core
         }
 
         protected sealed override void Update(GameTime gameTime)
-            => UpdateSystems(gameTime.ElapsedGameTime.TotalMilliseconds);
+        {
+            UpdateSystems(gameTime.ElapsedGameTime.TotalMilliseconds);
+
+            Update(gameTime.ElapsedGameTime.TotalMilliseconds);
+        }
 
         protected sealed override void Draw(GameTime gameTime)
             => DrawSystems();
@@ -42,8 +46,16 @@ namespace ECS.Core
             Unload();
         }
 
-        protected abstract void Load();
+        protected virtual void Load()
+        {
+        }
 
-        protected abstract void Unload();
+        protected virtual void Unload()
+        {
+        }
+
+        protected virtual void Update(double deltaTimeMs)
+        {
+        }
     }
 }

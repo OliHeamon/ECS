@@ -15,6 +15,9 @@
     <Reference Include="FNA">
       <HintPath>References\FNA.dll</HintPath>
     </Reference>
+    <Reference Include="NVorbis">
+      <HintPath>References\NVorbis.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

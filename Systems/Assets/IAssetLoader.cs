@@ -1,9 +1,13 @@
-﻿namespace ECS.Systems.Assets
+﻿using System;
+
+namespace ECS.Systems.Assets
 {
-    internal interface IAssetLoader
+    internal interface IAssetLoader : IDisposable
     {
         string FileExtension { get; }
 
-        internal void LoadAsset(string path);
+        Type AssetType { get; }
+
+        void LoadAsset(string path);
     }
 }

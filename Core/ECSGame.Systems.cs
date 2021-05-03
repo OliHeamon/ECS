@@ -80,7 +80,7 @@ namespace ECS.Core
             }
         }
 
-        public ECSSystem GetSystem<T>() where T : ECSSystem
-            => systemsByType[typeof(T)];
+        public T GetSystem<T>() where T : ECSSystem
+            => (T)systemsByType[typeof(T)];
     }
 }

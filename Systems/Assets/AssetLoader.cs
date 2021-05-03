@@ -1,4 +1,5 @@
 ﻿using ECS.Core.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -9,6 +10,8 @@ namespace ECS.Systems.Assets
         internal readonly Dictionary<string, T> assets;
 
         public abstract string FileExtension { get; }
+
+        public Type AssetType => typeof(T);
 
         public AssetLoader()
         {
@@ -32,6 +35,17 @@ namespace ECS.Systems.Assets
             }
 
             return assets[name];
+        }
+
+        public void Dispose()
+        {
+            foreach (T asset in assets.Values)
+            {
+                if (asset is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
     }
 }
